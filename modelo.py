@@ -23,11 +23,16 @@ class medicamento:
 class arbol:
     def __init__(self):
         self.raiz = None
+        self.alertas_stock=0
+        self.valor_total_inventario = 0.0
 
     def insertar(self, nodo, nuevo):
         if nodo is None:
             if nuevo.id % 2 == 0:
                 nuevo.precio *= 0.90
+            if nuevo.stock < 5:
+                self.alertas_stock += 1
+            self.valor_total_inventario += nuevo.precio * nuevo.stock
             return BinaryTreeNode(nuevo)
 
         if nuevo.id < nodo.data.id:
@@ -42,18 +47,6 @@ class arbol:
     def registrar(self, nuevo):
         self.raiz = self.insertar(self.raiz, nuevo)
 
-    def buscar(self, id):
-        actual = self.raiz
-
-        while actual is not None:
-            if id == actual.data.id:
-                return actual.data
-            elif id < actual.data.id:
-                actual = actual.leftchild
-            else:
-                actual = actual.rightchild
-
-        return None
 
     def busqueda_venta(self, id, cantidad, nodo):
         if nodo is None:
@@ -69,7 +62,6 @@ class arbol:
             return "La cantidad debe ser mayor que cero"
 
         if nodo.data.stock == 0:
-            self.sugerir_sustituto(id)
             return "Medicamento agotado"
 
         if nodo.data.stock < cantidad:
@@ -77,7 +69,13 @@ class arbol:
 
         nodo.data.stock -= cantidad
         return "Venta realizada correctamente"
-
+    
+    def nodo_mas_profundo(self,nodo):
+        current = nodo
+        while current.leftchild is not None:
+            current = current.leftchild
+        return current
+    
     def eliminar(self, id, nodo):
         if nodo is None:
             return None
@@ -89,67 +87,36 @@ class arbol:
             nodo.rightchild = self.eliminar(id, nodo.rightchild)
 
         else:
+            if nodo.data.stock < 5:
+                self.alertas_stock -= 1
+            self.valor_total_inventario -= nodo.data.precio * nodo.data.stock
+            
             if nodo.leftchild is None and nodo.rightchild is None:
                 return None
 
-            elif nodo.leftchild is None:
-                return nodo.rightchild
-
+            if nodo.leftchild is None:
+                temp = nodo.rightchild
+                nodo = None
+                return temp
             elif nodo.rightchild is None:
-                return nodo.leftchild
+                temp = nodo.leftchild
+                nodo = None
+                return temp
 
             else:
-                actual = nodo.rightchild
-
-                while actual.leftchild is not None:
-                    actual = actual.leftchild
-
-                nodo.data = actual.data
+                if nodo.data.stock < 5:
+                    self.alertas_stock += 1
+                self.valor_total_inventario += (nodo.data.precio * nodo.data.stock)
+                
+                actual = self.nodo_mas_profundo(nodo.rightchild)
+                nodo.data=actual.data
                 nodo.rightchild = self.eliminar(actual.data.id, nodo.rightchild)
-
-    return nodo
-
 
         return nodo
 
-    def eliminar_id(self, id):
-        if self.buscar(id) is None:
-            print("Medicamento no encontrado")
-            return
-
-        self.raiz = self.eliminar(id, self.raiz)
-        print("Medicamento eliminado correctamente")
-
-    def contar_alertas_stock(self, nodo):
-        if nodo is None:
-            return 0
-
-        alerta = 1 if nodo.data.stock < 5 else 0
-
-        return (
-            alerta
-            + self.contar_alertas_stock(nodo.leftchild)
-            + self.contar_alertas_stock(nodo.rightchild)
-        )
-
-    def calcular_valor_inventario(self, nodo):
-        if nodo is None:
-            return 0
-
-        valor = nodo.data.precio * nodo.data.stock
-
-        return (
-            valor
-            + self.calcular_valor_inventario(nodo.leftchild)
-            + self.calcular_valor_inventario(nodo.rightchild)
-        )
-
     def mostrar_estado(self):
-        print("Alertas de stock:", self.contar_alertas_stock(self.raiz))
-        print(
-            "Valor total del inventario:",
-            f"${self.calcular_valor_inventario(self.raiz):.2f}"
-        )
+        print(f"Alertas de stock:{self.alertas_stock}")
+        print(f"Valor total del inventario:${self.valor_total_inventario:.2f}")
 
     def limpiar_caducados(self, año, nodo):
         if nodo is None:
