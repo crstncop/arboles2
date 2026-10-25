@@ -1,6 +1,4 @@
 
-
-
 from Base import BinaryTreeNode
 
 TOTAL_OPERACIONES_FUSION = 0
