@@ -16,17 +16,24 @@ class BinaryTreeNode:
 
 
 def printTree(Node, prefix="", is_left=True):
-    if not Node:
+    if Node is None:
         return
 
-    if Node.rightchild:
-        printTree(Node.rightchild, prefix + ("│    " if is_left else "    "), False)
+    if Node.rightchild is not None:
+        printTree(
+            Node.rightchild,
+            prefix + ("│    " if is_left else "     "),
+            False
+        )
 
-    print(prefix + ("└── " if is_left else "┌── ") + str(Node.data))
+    print(prefix + ("└── " if is_left else "┌── ") + str(Node.data.id))
 
-    if Node.leftchild:
-        printTree(Node.leftchild, prefix + ("     " if is_left else "│   "), True)
-
+    if Node.leftchild is not None:
+        printTree(
+            Node.leftchild,
+            prefix + ("     " if is_left else "│    "),
+            True
+        )
 
     def Pre_Order(root):
 

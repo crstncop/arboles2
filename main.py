@@ -1,6 +1,7 @@
 
 from modelo import medicamento
 from modelo import arbol
+from Base import printTree
 
 
 def menu():
@@ -16,6 +17,7 @@ def menu():
         print("6. Mostrar inventario inverso")
         print("7. Consultar rango de IDs")
         print("8. Fusionar medicamentos")
+        print("9. Imprimir árbol")
         print("0. Salir")
 
         opcion = input("Seleccione una opción: ")
@@ -27,13 +29,9 @@ def menu():
             año = int(input("Año de vencimiento: "))
             precio = float(input("Precio: "))
 
-            if inventario.buscar(id) is not None:
-                print("El medicamento ya existe")
-            else:
-                nuevo = medicamento(id, nombre, stock, año, precio)
-                inventario.registrar(nuevo)
-                print("Medicamento registrado")
-                inventario.mostrar_estado()
+            nuevo = medicamento(id, nombre, stock, año, precio)
+            inventario.registrar(nuevo)
+            inventario.mostrar_estado()
 
         elif opcion == "2":
             id = int(input("ID del medicamento: "))
@@ -54,7 +52,6 @@ def menu():
         elif opcion == "4":
             año = int(input("Año actual: "))
             inventario.reporte_caducidad(año)
-            print("Limpieza de caducidad completada")
             inventario.mostrar_estado()
 
         elif opcion == "5":
@@ -83,7 +80,13 @@ def menu():
 
             inventario.fusionar(id_origen, id_destino)
             inventario.mostrar_estado()
-            print("Total de fusiones:", TOTAL_OPERACIONES_FUSION)
+
+        elif opcion == "9":
+            if inventario.raiz is None:
+                print("Inventario vacío")
+            else:
+                print("\n--- ÁRBOL DE INVENTARIO ---")
+                printTree(inventario.raiz)
 
         elif opcion == "0":
             print("Saliendo del sistema")
@@ -94,3 +97,4 @@ def menu():
 
 
 menu()
+

@@ -84,7 +84,7 @@ class arbol:
         if id > nodo.data.id:
             return self.busqueda_venta(id, cantidad, nodo.rightchild)
 
-        if nodo.data.stock == 0:
+        if nodo.data.stock <= 0:
             sustituto = self.sucesor_inorder(id)
 
             if sustituto is None or sustituto.stock <= 0:
