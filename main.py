@@ -1,7 +1,6 @@
 
-from modelo import medicamento
-from modelo import arbol
-from Base import printTree
+from modelo import arbol,TOTAL_OPERACIONES_FUSION,medicamento
+from Base import  printTree
 
 
 def menu():
