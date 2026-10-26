@@ -117,34 +117,43 @@ class arbol:
         return actual
 
     def eliminar(self, id, nodo, actualizar=True):
-        if nodo is None:
+    if nodo is None:
+        return None
+
+    if id < nodo.data.id:
+        nodo.leftchild = self.eliminar(id, nodo.leftchild, actualizar)
+
+    elif id > nodo.data.id:
+        nodo.rightchild = self.eliminar(id, nodo.rightchild, actualizar)
+
+    else:
+        if actualizar:
+            if nodo.data.stock < 5:
+                self.alertas_stock -= 1
+
+            self.valor_total_inventario -= nodo.data.precio * nodo.data.stock
+
+        if nodo.leftchild is None and nodo.rightchild is None:
             return None
 
-        if id < nodo.data.id:
-            nodo.leftchild = self.eliminar(id, nodo.leftchild, actualizar)
+        elif nodo.leftchild is None:
+            hijo = nodo.rightchild
+            nodo.data = hijo.data
+            nodo.leftchild = hijo.leftchild
+            nodo.rightchild = hijo.rightchild
 
-        elif id > nodo.data.id:
-            nodo.rightchild = self.eliminar(id, nodo.rightchild, actualizar)
+        elif nodo.rightchild is None:
+            hijo = nodo.leftchild
+            nodo.data = hijo.data
+            nodo.leftchild = hijo.leftchild
+            nodo.rightchild = hijo.rightchild
 
         else:
-            if actualizar:
-                if nodo.data.stock < 5:
-                    self.alertas_stock -= 1
-
-                self.valor_total_inventario -= (nodo.data.precio * nodo.data.stock)
-
-            if nodo.leftchild is None:
-                return nodo.rightchild
-
-            if nodo.rightchild is None:
-                return nodo.leftchild
-
             sucesor = self.nodo_mas_profundo(nodo.rightchild)
             nodo.data = sucesor.data
-
             nodo.rightchild = self.eliminar(sucesor.data.id, nodo.rightchild, False)
 
-        return nodo
+    return nodo
 
     def eliminar_id(self, id):
         if self.buscar(id) is None:
